@@ -1,0 +1,132 @@
+<!-- 混色ゲームをHTML1ファイルでつくって by OpenAI API -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>混色ゲーム</title>
+    <style>
+    body {
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+        background-color: #f0f8ff; /* 明るい水色背景 */
+    }
+    input[type="color"] {
+        margin: 20px;
+        width: 60px; /* カラーピッカーを少し大きめに */
+        height: 60px;
+        border: none; /* ボーダーを削除 */
+        border-radius: 50%; /* 丸くする */
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* アニメーション */
+    }
+    input[type="color"]:hover {
+        transform: scale(1.2); /* ホバー時にサイズを大きく */
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* ホバー時に影を追加 */
+    }
+    .result {
+        margin-top: 30px;
+        padding: 20px;
+        border-radius: 10px;
+        display: inline-block;
+        background-color: #fff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* ボックスに影を追加 */
+        border: 2px dashed #ff1493; /* ダッシュ線ボーダー */
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #333;
+        transition: background-color 0.3s ease; /* 背景色の変化アニメーション */
+    }
+    .result.correct {
+        background-color: #98fb98; /* 正解時に明るい緑 */
+        color: #006400; /* 正解の文字色 */
+    }
+    .result.incorrect {
+        background-color: #ffb6c1; /* 不正解時にピンク色 */
+        color: #8b0000; /* 不正解の文字色 */
+    }
+    h1 {
+        font-size: 3em; /* 見出しを大きく */
+        color: #ff4500; /* 元気なオレンジ色 */
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* 見出しに影を追加 */
+    }
+    .instructions {
+        font-size: 1.3em;
+        color: #4682b4; /* 明るい青色 */
+        margin-top: 10px;
+    }
+    button {
+        background-color: #ff6347; /* ボタンの背景色をトマト色に */
+        color: white;
+        padding: 15px 30px;
+        font-size: 1.2em;
+        margin: 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    button:hover {
+        transform: scale(1.1); /* ボタンを少し大きくする */
+        background-color: #ff4500; /* ホバー時に色を変更 */
+    }
+</style>
+
+
+
+
+</head>
+<body>
+
+    <h1>混色ゲーム</h1>
+    <p>2つの色を選んで、混色結果を見ましょう!</p>
+
+    <input type="color" id="color1" value="#ff0000">
+    <input type="color" id="color2" value="#0000ff">
+    <button onclick="mixColors()">色を混ぜる</button>
+
+    <div class="result" id="result">
+        <p>混色結果</p>
+        <div id="mixed-color" style="width: 100px; height: 100px; background-color: #ffffff;"></div>
+    </div>
+
+    <script>
+        function mixColors() {
+            // Get the colors from the inputs
+            const color1 = document.getElementById('color1').value;
+            const color2 = document.getElementById('color2').value;
+
+            // Convert hex to RGB
+            const rgb1 = hexToRgb(color1);
+            const rgb2 = hexToRgb(color2);
+
+            // Mix the colors
+            const mixedColor = {
+                r: Math.floor((rgb1.r + rgb2.r) / 2),
+                g: Math.floor((rgb1.g + rgb2.g) / 2),
+                b: Math.floor((rgb1.b + rgb2.b) / 2)
+            };
+
+            // Convert RGB back to hex
+            const mixedColorHex = rgbToHex(mixedColor.r, mixedColor.g, mixedColor.b);
+
+            // Display the mixed color
+            document.getElementById('mixed-color').style.backgroundColor = mixedColorHex;
+        }
+
+        function hexToRgb(hex) {
+            const bigint = parseInt(hex.slice(1), 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+            return { r, g, b };
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+    </script>
+
+</body>
+</html>
