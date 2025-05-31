@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カラーパレットゲーム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .color-box {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        #target-color,
+        #your-color {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            border: 1px solid #000;
+        }
+
+        input[type="range"] {
+            width: 90%;
+            height: 25px;
+            margin: 10px 0;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #ddd;
+            border-radius: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 25px;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 15px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 80%;
+        }
+
+        #result, #percentage {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .color-box {
+                width: 80px;
+                height: 80px;
+            }
+
+            #target-color,
+            #your-color {
+                width: 120px;
+                height: 120px;
+            }
+
+            input[type="range"] {
+                width: 95%;
+            }
+
+            button {
+                width: 90%;
+                font-size: 1em;
+            }
+
+            #result, #percentage {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>カラーパレットミキサー</h1>
+    <p>「カラーパレットミキサー」は、あなたの色彩感覚を鍛えるアート系ゲームです!<br>このゲームでは、カラーパレットを使って指定された色を作り上げることが目標です。<br>色を混ぜ合わせ、どれだけ正確に目標色を再現できるかがポイント!<br>自分の色彩センスを試しながら、楽しく学びましょう。</p>
+    
+    <div>
+        <h2 style="color:red">目標の色:</h2>
+        <div id="target-color" class="color-box"></div>
+    </div>
+    <div>
+        <h2>作った色:</h2>
+        <div id="your-color" class="color-box"></div>
+        <div>
+            <label>R: <input type="range" id="red" min="0" max="255" value="0"></label><br>
+            <label>G: <input type="range" id="green" min="0" max="255" value="0"></label><br>
+            <label>B: <input type="range" id="blue" min="0" max="255" value="0"></label><br>
+        </div>
+        <button onclick="checkColor()">チェック</button>
+        <button onclick="resetGame()">リセット</button>
+        <p id="result"></p>
+        <p id="percentage"></p>
+    </div>
+
+    <script>
+        const targetColorBox = document.getElementById('target-color');
+        const yourColorBox = document.getElementById('your-color');
+        const resultText = document.getElementById('result');
+        const percentageText = document.getElementById('percentage');
+
+        let targetColor = randomColor();
+
+        function randomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return { r, g, b };
+        }
+
+        function updateYourColor() {
+            const r = document.getElementById('red').value;
+            const g = document.getElementById('green').value;
+            const b = document.getElementById('blue').value;
+            yourColorBox.style.backgroundColor = `rgb(${r},${g},${b})`;
+        }
+
+        document.getElementById('red').addEventListener('input', updateYourColor);
+        document.getElementById('green').addEventListener('input', updateYourColor);
+        document.getElementById('blue').addEventListener('input', updateYourColor);
+
+        function calculateColorDifference(target, user) {
+            const rDiff = Math.abs(target.r - user.r);
+            const gDiff = Math.abs(target.g - user.g);
+            const bDiff = Math.abs(target.b - user.b);
+
+            const totalDiff = (rDiff + gDiff + bDiff) / (255 * 3);
+            return totalDiff * 100;
+        }
+
+        function checkColor() {
+            const r = document.getElementById('red').value;
+            const g = document.getElementById('green').value;
+            const b = document.getElementById('blue').value;
+
+            const userColor = { r, g, b };
+            const colorDifferencePercent = calculateColorDifference(targetColor, userColor);
+
+            if (colorDifferencePercent === 0) {
+                resultText.textContent = "完璧!目標色とぴったり一致!";
+                resultText.style.color = "green";
+            } else if (colorDifferencePercent <= 10) {
+                resultText.textContent = "とても良い!かなり近い色です!";
+                resultText.style.color = "yellowgreen";
+            } else if (colorDifferencePercent <= 20) {
+                resultText.textContent = "良い感じ!まだ少しだけ違います。";
+                resultText.style.color = "orange";
+            } else {
+                resultText.textContent = "もう少し!頑張って再調整してみて!";
+                resultText.style.color = "red";
+            }
+
+            percentageText.textContent = `色の差: ${colorDifferencePercent.toFixed(2)}%`;
+        }
+
+        function resetGame() {
+            targetColor = randomColor();
+            targetColorBox.style.backgroundColor = `rgb(${targetColor.r},${targetColor.g},${targetColor.b})`;
+            document.getElementById('red').value = 0;
+            document.getElementById('green').value = 0;
+            document.getElementById('blue').value = 0;
+            yourColorBox.style.backgroundColor = "rgb(0, 0, 0)";
+            resultText.textContent = "";
+            percentageText.textContent = "";
+        }
+
+        targetColorBox.style.backgroundColor = `rgb(${targetColor.r},${targetColor.g},${targetColor.b})`;
+    </script>
+</body>
+</html>
+
