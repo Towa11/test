@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国旗当てクイズ</title>
+    <style>
+    body {
+        background-color: #f5f5f5;
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        text-align: center;
+    }
+    h1 {
+        font-size: 2.5em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    #flag-container {
+        margin-bottom: 30px;
+    }
+    img {
+        width: 300px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 30px;
+        margin: 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1.2em;
+        transition: background-color 0.3s ease;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    #reset-button {
+        background-color: #f44336;
+        font-size: 1.5em;
+        padding: 15px 40px;
+        margin-top: 20px;
+    }
+    #reset-button:hover {
+        background-color: #d32f2f;
+    }
+    #result {
+        font-size: 1.5em;
+        margin-top: 30px;
+        font-weight: bold;
+        padding: 15px;
+        border-radius: 10px;
+        width: 80%;
+        margin: 0 auto;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    #result.correct {
+        color: #4CAF50;
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+    #result.incorrect {
+        color: #f44336;
+        background-color: rgba(244, 67, 54, 0.1);
+    }
+    #choices {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .choice-button {
+        margin: 10px;
+        width: 200px;
+    }
+</style>
+
+</head>
+<body>
+
+<h1>-国旗当てクイズ-</h1>
+<div id="flag-container">
+    <img id="flag-image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/188px-Flag_of_the_United_States.svg.png" alt="国旗">
+</div>
+<div id="choices">
+    <button onclick="checkAnswer('アメリカ')">アメリカ</button>
+    <button onclick="checkAnswer('カナダ')">カナダ</button>
+    <button onclick="checkAnswer('メキシコ')">メキシコ</button>
+</div>
+<div id="result"></div>
+<button id="reset-button" onclick="resetGame()">リセット</button>
+
+<script>
+    // 問題データ(国旗と国名のリスト)
+    const questions = [
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/188px-Flag_of_the_United_States.svg.png',
+            correctAnswer: 'アメリカ',
+            choices: ['アメリカ', 'カナダ', 'メキシコ']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/1920px-Flag_of_Japan.svg.png',
+            correctAnswer: '日本',
+            choices: ['日本', '韓国', '中国']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/960px-Flag_of_Germany.svg.png',
+            correctAnswer: 'ドイツ',
+            choices: ['ドイツ', 'フランス', 'イギリス']
+        },
+        {
+            flag: 'https://www.world-national-flags.com/media/001/202006/Flag_of_India.svg',
+            correctAnswer: 'インド',
+            choices: ['インド', 'パキスタン', 'バングラデシュ']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/520px-Flag_of_France.svg.png',
+            correctAnswer: 'フランス',
+            choices: ['フランス', 'スペイン', 'ポルトガル']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/250px-Flag_of_Brazil.svg.png',
+            correctAnswer: 'ブラジル',
+            choices: ['ブラジル', 'アルゼンチン', 'チリ']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/250px-Flag_of_Italy.svg.png',
+            correctAnswer: 'イタリア',
+            choices: ['イタリア', 'スイス', 'ドイツ']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/520px-Flag_of_the_People%27s_Republic_of_China.svg.png',
+            correctAnswer: '中国',
+            choices: ['中国', 'インド', '日本']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Russia.svg/500px-Flag_of_Russia.svg.png',
+            correctAnswer: 'ロシア',
+            choices: ['ロシア', 'ウクライナ', 'カザフスタン']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/250px-Flag_of_Mexico.svg.png',
+            correctAnswer: 'メキシコ',
+            choices: ['メキシコ', 'ブラジル', 'アルゼンチン']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/250px-Flag_of_South_Korea.svg.png',
+            correctAnswer: '韓国',
+            choices: ['韓国', '日本', '中国']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/250px-Flag_of_the_United_Kingdom_%281-2%29.svg.png',
+            correctAnswer: 'イギリス',
+            choices: ['イギリス', 'フランス', 'アメリカ']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Flag_of_Australia.svg/250px-Flag_of_Australia.svg.png',
+            correctAnswer: 'オーストラリア',
+            choices: ['オーストラリア', 'ニュージーランド', 'イギリス']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/250px-Flag_of_Spain.svg.png',
+            correctAnswer: 'スペイン',
+            choices: ['スペイン', 'ポルトガル', 'フランス']
+        },
+        {
+            flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Morocco.svg/250px-Flag_of_Morocco.svg.png',
+            correctAnswer: 'モロッコ',
+            choices: ['モロッコ', 'アルジェリア', 'チュニジア']
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+
+    // ランダムに問題を表示する関数
+    function loadQuestion() {
+        const question = questions[currentQuestionIndex];
+        const flagImage = document.getElementById('flag-image');
+        const choicesDiv = document.getElementById('choices');
+        const resultDiv = document.getElementById('result');
+
+        flagImage.src = question.flag;
+        resultDiv.textContent = ''; // 結果をリセット
+
+        // 選択肢をランダムにシャッフル
+        const shuffledChoices = shuffleArray([...question.choices]);
+
+        // 選択肢ボタンの更新
+        choicesDiv.innerHTML = ''; // 既存の選択肢をリセット
+        shuffledChoices.forEach(choice => {
+            const button = document.createElement('button');
+            button.textContent = choice;
+            button.onclick = () => checkAnswer(choice);
+            choicesDiv.appendChild(button);
+        });
+    }
+
+    // 配列のシャッフル関数(Fisher-Yatesアルゴリズム)
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+        return array;
+    }
+
+    // 正解チェック
+    function checkAnswer(selectedCountry) {
+    const question = questions[currentQuestionIndex];
+    const resultDiv = document.getElementById('result');
+    
+    if (selectedCountry === question.correctAnswer) {
+        resultDiv.textContent = '正解!';
+        resultDiv.style.color = 'green'; // 正解は緑色で表示
+        
+        // 正解した場合のみ次の問題をロード
+        currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+        setTimeout(loadQuestion, 1000); // 1秒後に次の問題を表示
+    } else {
+        resultDiv.textContent = '不正解。もう一度試してください。';
+        resultDiv.style.color = 'red'; // 不正解は赤色で表示
+    }
+}
+
+
+    // ゲームのリセット
+    function resetGame() {
+        currentQuestionIndex = 0;
+        loadQuestion();
+    }
+
+    // 最初の問題を読み込む
+    loadQuestion();
+</script>
+
+</body>
+</html>
